@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@imtbl/imx-contracts/contracts/Mintable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 //import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
-contract Date is Ownable, ERC721{
+contract Date is Mintable, ERC721{
 
     struct Metadata {
         uint16 year;
@@ -20,7 +20,12 @@ contract Date is Ownable, ERC721{
 
     string private _currentBaseURI;
 
-    constructor() ERC721 ("Date", "DATE") {
+    constructor(
+        address _owner,
+        string memory _name,
+        string memory _symbol,
+        address _imx
+    ) ERC721 (_name, _symbol) Mintable(_owner, _imx) {
         setBaseURI("https://opensea1.digiperson.win/token/");
 
         mint(1, 1, 1, 4, "ORIGIN");
@@ -35,31 +40,21 @@ contract Date is Ownable, ERC721{
         mint(2011, 12, 5, 0, "We've found our next home, Kepler-22b");
     }
 
-    /*
-        function _beforeTokenTransfer(address from, address to, uint256 tokenId)
-        internal
-        override(ERC721, ERC721Enumerable)
-        {
-            super._beforeTokenTransfer(from, to, tokenId);
-        }
-
-        function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC721, ERC721Enumerable)
-        returns (bool)
-        {
-            return super.supportsInterface(interfaceId);
-        }
-    */
+    function _mintFor(
+        address to,
+        uint256 id_t,
+        bytes memory
+    ) internal override {
+        _safeMint(to, id_t);
+    }
 
     function setBaseURI(string memory baseURI_t) public onlyOwner {
         _currentBaseURI = baseURI_t;
     }
 
-    function baseURI() public view override  returns (string memory) {
+    /*function baseURI() public view override  returns (string memory) {
         return _currentBaseURI;
-    }
+    }*/
 
     function mint(uint16 year, uint8 month, uint8 day, uint8 color, string memory title) internal {
         uint256 tokenId = id(year, month, day);
